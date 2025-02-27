@@ -1,6 +1,6 @@
 # ormGPT
 
-An ORM based on OpenAI that translates plain human language into SQL queries and executes them on a database.
+An ORM that translates plain human language into SQL queries and executes them on a database.
 
 Currently supports database dialects: MySQL, PostgreSQL, and SQLite.
 
@@ -76,11 +76,12 @@ Prepare a database schema file, for example `schema.sql`. This file will be used
   });
 
   const ormgpt = new ormGPT({
-    apiKey: "OPENAI_API_KEY",
-    schemaFilePath: "./example/schema.sql",
-    dialect: "postgres",
-    dbEngineAdapter: mysqlAdapter,
-  });
+  apiKey: process.env.HUGGING_FACE_API_KEY || "",  // Use Hugging Face API Key from the environment
+  schemaFilePath: "./example/schema.sql",
+  dialect: "postgres",
+  dbEngineAdapter: mysqlAdapter,
+});
+
 
   await ormgpt.query(
     "add new user with username 'test' and email 'test@example.com'",
@@ -129,11 +130,6 @@ const sqliteAdapter = new SqliteAdapter({
   dbFilePath: "./example/db.sqlite",
 });
 ```
-
-### Why?
-
-In the last two years, I found ORMs to be new "days since the last javascript framework" in the JavaScript ecosystem. And since AI is a hot buzzword
-I decided to experiment a little to combine both and create an ORM that uses OpenAI to generate SQL queries. Please don't use this in production.
 
 ### License
 MIT

@@ -3,7 +3,7 @@
   "version": "1.0.2",
   "main": "./dist/index.js",
   "repository": {
-    "url": "https://github.com/pilotpirxie/ormGPT.git",
+    "url": "https://github.com/WarnikaRaina/ormAI,git",
     "type": "git"
   },
   "license": "MIT",
@@ -13,16 +13,17 @@
     "demo:sqlite": "ts-node example/sqlite.ts",
     "demo:postgres": "ts-node example/postgres.ts",
     "demo:mysql": "ts-node example/mysql.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "postinstall": "npm rebuild better-sqlite3"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.5",
     "@types/node": "18",
-    "@types/pg": "^8.10.5",
-    "dotenv": "^16.3.1",
+    "@types/pg": "^8.11.11",
+    "dotenv": "^16.4.7",
     "prettier": "^3.0.3",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.7.3"
   },
   "keywords": [
     "orm",
@@ -35,9 +36,13 @@
     "db"
   ],
   "dependencies": {
+    "@types/sqlite3": "^3.1.11",
+    "axios": "^1.8.1",
     "better-sqlite3": "^9.0.0",
-    "mysql2": "^3.6.1",
-    "pg": "^8.11.3"
+    "mysql2": "^3.12.0",
+    "node-fetch": "^3.3.2",
+    "pg": "^8.13.3",
+    "sqlite3": "^5.1.7"
   },
   "files": [
     "dist"

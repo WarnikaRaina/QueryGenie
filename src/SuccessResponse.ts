@@ -1,4 +1,5 @@
 export type SuccessResponse = {
+  generated_text: string | PromiseLike<string>;
   id: string;
   object: string;
   created: number;

@@ -1,24 +1,25 @@
+import fetch from 'node-fetch';
 import fs from "fs";
 import path from "path";
-import {ErrorResponse} from "./ErrorResponse";
-import {SuccessResponse} from "./SuccessResponse";
-import {DatabaseEngineAdapter} from "./DatabaseEngineAdapter";
-import {ModelTuning} from "./ModelTuning";
+import { ErrorResponse } from "./ErrorResponse";
+import { SuccessResponse } from "./SuccessResponse";
+import { DatabaseEngineAdapter } from "./DatabaseEngineAdapter";
+import { ModelTuning } from "./ModelTuning";
 
 export class ormGPT {
   private apiKey: string;
-  private apiUrl: string = "https://api.openai.com/v1/chat/completions";
+  private apiUrl: string = "https://api-inference.huggingface.co/models/facebook/llama-2-7b";  // Hugging Face LLaMA model endpoint
   private dbSchema: string;
   private dialect: string;
   private dbEngineAdapter?: DatabaseEngineAdapter;
-  private model: string = "gpt-3.5-turbo";
+  private model: string = "facebook/llama-2-7b";  // Default to Hugging Face LLaMA model
   private modelOptions: ModelTuning = {
     temperature: 1,
     max_tokens: 256,
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0,
-  }
+  };
 
   constructor({
     apiKey,
@@ -27,8 +28,8 @@ export class ormGPT {
     dbEngineAdapter,
     apiUrl,
     model,
-    modelOptions
-  } : {
+    modelOptions,
+  }: {
     apiKey: string;
     schemaFilePath: string;
     dialect: "postgres" | "mysql" | "sqlite";
@@ -43,10 +44,10 @@ export class ormGPT {
     this.dbEngineAdapter = dbEngineAdapter;
 
     if (apiUrl) {
-      this.apiUrl = apiUrl;
+      this.apiUrl = apiUrl;  // Hugging Face URL or custom API URL if needed
     }
     if (model) {
-      this.model = model;
+      this.model = model;  // Default model is LLaMA
     }
     if (modelOptions) {
       this.modelOptions = modelOptions;
@@ -55,7 +56,7 @@ export class ormGPT {
 
   private async getResponse(request: string): Promise<string> {
     const prompt = `
-                You are an SQL engine brain. 
+                You are an SQL engine brain.
                 You are using ${this.dialect} dialect.
                 Having db schema as follows:
                 ${this.dbSchema}
@@ -69,17 +70,12 @@ export class ormGPT {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${this.apiKey}`,  // Use Hugging Face API key here
       },
       body: JSON.stringify({
-        model: this.model,
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        ...this.modelOptions,
+        model: this.model,  // Use the LLaMA model for generating SQL queries
+        inputs: prompt,  // Send prompt for query generation
+        ...this.modelOptions,  // Pass model options like temperature, etc.
       }),
     });
 
@@ -89,7 +85,7 @@ export class ormGPT {
       throw new Error((data as ErrorResponse).error.message);
     }
 
-    return (data as SuccessResponse).choices[0].message.content;
+    return (data as SuccessResponse).generated_text;  // Response for the generated query from Hugging Face
   }
 
   public async getQuery(request: string): Promise<string> {

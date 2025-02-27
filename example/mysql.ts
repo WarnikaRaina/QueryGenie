@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { ormGPT } from "../src";
-import {createConnection} from "mysql2/promise";
-import {MysqlAdapter} from "../src/MysqlAdapter";
+import { createConnection } from "mysql2/promise";
+import { MysqlAdapter } from "../src/MysqlAdapter";
 
 (async () => {
   const client = await createConnection({
@@ -9,7 +9,7 @@ import {MysqlAdapter} from "../src/MysqlAdapter";
     port: 3306,
     database: 'ormgpt',
     user: 'root',
-    password: 'mysecretpassword',
+    password: 'War@123MS',
   });
 
   const mysqlAdapter = new MysqlAdapter({
@@ -17,14 +17,14 @@ import {MysqlAdapter} from "../src/MysqlAdapter";
   });
 
   const ormgpt = new ormGPT({
-    apiKey: process.env.OPENAI_API_KEY || "",
+    apiKey: process.env.HUGGING_FACE_API_KEY || "", // Use Hugging Face API Key
     schemaFilePath: "./example/schema.sql",
-    dialect: "postgres",
+    dialect: "postgres", // or "mysql" or any other dialect you are using
     dbEngineAdapter: mysqlAdapter,
   });
 
   await ormgpt.query(
-    "add new user with username 'test' and email 'test@example.com'",
+    "add new user with username 'test' and email 'test@example.com'"
   );
 
   const users = await ormgpt.query("get all users");
