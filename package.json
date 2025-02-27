@@ -14,7 +14,8 @@
     "demo:postgres": "ts-node example/postgres.ts",
     "demo:mysql": "ts-node example/mysql.ts",
     "build": "tsc",
-    "postinstall": "npm rebuild better-sqlite3"
+    "postinstall": "npm rebuild better-sqlite3",
+    "start": "node dist/index.js" 
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.5",
