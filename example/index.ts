@@ -82,4 +82,18 @@ import axios from 'axios';  // Import axios for making API calls to Hugging Face
     "WHERE c.name = 'Electronics'"
   );
   console.log(productsInCategoryQuery);
+
 })();
+
+import http from 'http';
+
+const port = process.env.PORT || 3000;  // Use Render's port or fallback to 3000 for local development
+
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Hello World\n');  // Placeholder response, you can modify this for your app's functionality
+});
+
+server.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
