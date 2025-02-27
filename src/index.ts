@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 import fs from "fs";
 import path from "path";
 import { ErrorResponse } from "./ErrorResponse";
