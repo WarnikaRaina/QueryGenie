@@ -30,3 +30,7 @@ coverage/
 *.log
 *.md
 *.tmp
+
+# Ignore the database data files in case they are stored in docker/postgres or docker/mysql
+.docker/postgres/
+.docker/mysql/
