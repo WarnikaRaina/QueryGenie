@@ -5,8 +5,8 @@ services:
     image: postgres:15
     environment:
       POSTGRES_DB: ormgpt
-      POSTGRES_USER: mysecretuser
-      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: War@123PG
     ports:
       - "5432:5432"
     volumes:
@@ -15,10 +15,25 @@ services:
   db2:
     image: mysql:8
     environment:
-      MYSQL_ROOT_PASSWORD: mysecretpassword
+      MYSQL_ROOT_PASSWORD: War@123MS
       MYSQL_DATABASE: ormgpt
     restart: unless-stopped
     ports:
       - "3306:3306"
     volumes:
         - ./.docker/mysql:/var/lib/mysql
+        app:
+    build: .
+    environment:
+      NODE_ENV: production
+      POSTGRES_HOST: db
+      MYSQL_HOST: db2
+      HUGGING_FACE_API_KEY: your-hugging-face-api-key
+    ports:
+      - "3000:3000"  # Exposing port 3000, or use process.env.PORT if you want to make it dynamic
+    depends_on:
+      - db
+      - db2
+    volumes:
+      - .:/usr/src/app
+    restart: unless-stopped
