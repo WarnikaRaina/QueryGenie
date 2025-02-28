@@ -7,6 +7,12 @@ WORKDIR /usr/src/app
 # Step 3: Copy package.json and package-lock.json (if exists) to install dependencies
 COPY package*.json ./
 
+# Debugging Step: List the contents of the /usr/src/app directory to verify the files
+RUN echo "Listing files in /usr/src/app:" && ls -l /usr/src/app
+
+# Debugging Step: Output the contents of package.json to verify it was copied correctly
+RUN echo "Contents of package.json:" && cat /usr/src/app/package.json
+
 # Step 4: Install the dependencies
 RUN npm install
 
