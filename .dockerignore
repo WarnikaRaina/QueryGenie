@@ -19,9 +19,6 @@ LICENSE
 # Ignore the ormGPT.iml file (specific to your IDE, not needed in Docker image)
 ormGPT.iml
 
-# Ignore package-lock.json (since dependencies are installed in the image)
-package-lock.json
-
 # Ignore yarn.lock (if you're using npm instead of yarn)
 yarn.lock
 
