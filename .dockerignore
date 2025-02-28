@@ -1,27 +1,40 @@
-# Ignore the nginx directory
-nginx
+# Ignore the node_modules directory as dependencies will be installed during the build process
+node_modules/
 
-# Ignore node_modules directory
-node_modules
+# Ignore the source code (src directory), as we only need the compiled code in dist/
+src/
 
-# Ignore npm-debug.log files
-npm-debug.log
+# Ignore .DS_Store files specific to macOS
+.DS_Store
 
-# Ignore docker-compose.yml file
-docker-compose.yml
-
-# Ignore markdown files
-*.md
-
-# Ignore JSON files
-*.json
-
-# Ignore log files
-*.log
-
-# Ignore Git files
-.git
+# Ignore .gitignore file (it's not needed in Docker image)
 .gitignore
 
-# Ignore system-specific files
-.DS_Store
+# Ignore docker-compose.yml file (used locally for development, not needed in Docker image)
+docker-compose.yml
+
+# Ignore LICENSE file (unless required in Docker image)
+LICENSE
+
+# Ignore the ormGPT.iml file (specific to your IDE, not needed in Docker image)
+ormGPT.iml
+
+# Ignore package-lock.json (since dependencies are installed in the image)
+package-lock.json
+
+# Ignore yarn.lock (if you're using npm instead of yarn)
+yarn.lock
+
+# Ignore test-related files or directories if you have them
+test/
+coverage/
+
+# Ignore the temporary or unnecessary files in dist
+*.log
+*.md
+*.json
+*.tmp
+
+# Ignore the database data files in case they are stored in docker/postgres or docker/mysql
+.docker/postgres/
+.docker/mysql/
