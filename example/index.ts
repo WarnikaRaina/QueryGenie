@@ -87,13 +87,15 @@ import axios from 'axios';  // Import axios for making API calls to Hugging Face
 
 import http from 'http';
 
-const port = process.env.PORT || 3000;  // Use Render's port or fallback to 3000 for local development
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;  // Parse to number in case it's a string
 
 const server = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Hello World\n');  // Placeholder response, you can modify this for your app's functionality
+  res.end('Hello World\n');  // Placeholder response, modify this for your app's functionality
 });
 
-server.listen(port, () => {
+// Use 0.0.0.0 as the hostname and pass the port as a number
+server.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on port ${port}`);
 });
+
