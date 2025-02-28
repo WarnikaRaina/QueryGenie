@@ -39,7 +39,18 @@ export class ormGPT {
     modelOptions?: ModelTuning;
   }) {
     this.apiKey = apiKey;
-    this.dbSchema = fs.readFileSync(path.resolve(schemaFilePath), "utf-8");
+    
+    // Adjust the schemaFilePath to match the Docker container path
+    // The path should be inside the Docker container. Assuming schema.sql is copied to /usr/src/app/example/schema.sql
+    const schemaPath = path.resolve("/usr/src/app/example/schema.sql");
+    
+    try {
+      this.dbSchema = fs.readFileSync(schemaPath, "utf-8");
+    } catch (error) {
+      console.error("Error reading schema file at path:", schemaPath);
+      throw error;
+    }
+
     this.dialect = dialect;
     this.dbEngineAdapter = dbEngineAdapter;
 
