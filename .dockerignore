@@ -29,7 +29,6 @@ coverage/
 # Ignore the temporary or unnecessary files in dist
 *.log
 *.md
-*.json
 *.tmp
 
 # Ignore the database data files in case they are stored in docker/postgres or docker/mysql
