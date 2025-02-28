@@ -19,8 +19,11 @@ RUN npm install
 # Step 5: Copy the rest of the application code
 COPY . .
 
-# Step 6: Expose the port your app will be running on (Render will bind to this)
+# Step 6: Copy the schema.sql file from the example folder into the container
+COPY example/schema.sql /usr/src/app/example/schema.sql
+
+# Step 7: Expose the port your app will be running on (Render will bind to this)
 EXPOSE 3000
 
-# Step 7: Define the command to start the app
+# Step 8: Define the command to start the app
 CMD ["npm", "start"]
