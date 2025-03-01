@@ -1,7 +1,7 @@
+// src/postgres.ts
 import "dotenv/config";
 import { ormGPT } from "../src";
-import { SqliteAdapter } from "../src/SqliteAdapter";
-import { Client, Pool } from 'pg';
+import { Client } from 'pg';
 import { PostgresAdapter } from "../src/PostgresAdapter";
 
 (async () => {
@@ -10,9 +10,9 @@ import { PostgresAdapter } from "../src/PostgresAdapter";
     port: 5432,
     database: 'ormgpt',
     user: 'postgres',
-    password: 'War@123PG',
+    password: 'War@123PG', 
   });
-  client.connect();
+  await client.connect();
 
   const postgresAdapter = new PostgresAdapter({
     client
@@ -20,9 +20,9 @@ import { PostgresAdapter } from "../src/PostgresAdapter";
 
   const ormgpt = new ormGPT({
     apiKey: process.env.HUGGING_FACE_API_KEY || "",  // Use Hugging Face API Key
-    schemaFilePath: "./example/schema.sql",
-    dialect: "postgres",
-    dbEngineAdapter: postgresAdapter,
+    schemaFilePath: '/usr/src/app/example/schema.sql',  // Ensure consistency with schema file path
+    dialect: "postgres",  // Use PostgreSQL dialect
+    dbEngineAdapter: postgresAdapter,  // Provide Postgres adapter
   });
 
   await ormgpt.query(

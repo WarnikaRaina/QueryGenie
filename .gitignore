@@ -128,4 +128,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# dotenv environment variable files
 .env
+
+# Ignore MySQL socket file
+.docker/mysql/mysql.sock

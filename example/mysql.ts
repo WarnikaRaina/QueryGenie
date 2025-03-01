@@ -6,7 +6,7 @@ import { MysqlAdapter } from "../src/MysqlAdapter";
 (async () => {
   const client = await createConnection({
     host: 'localhost',
-    port: 3306,
+    port: 3307,
     database: 'ormgpt',
     user: 'root',
     password: 'War@123MS',

@@ -4,6 +4,9 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { Pool } from 'pg';
 import mysql from 'mysql2';
+import { MysqlAdapter } from './MysqlAdapter'; // Import MySQL adapter
+import { PostgresAdapter } from './PostgresAdapter'; // Import Postgres adapter
+import { ormGPT } from './ormGPT'; // Assuming you have an ormGPT instance in the src directory
 
 // Load environment variables
 dotenv.config();
@@ -16,7 +19,7 @@ const pgPool = new Pool({
   host: process.env.POSTGRES_HOST,
   port: 5432,
   user: 'postgres',
-  password: 'War@123PG',
+  password: 'abc',
   database: 'ormgpt',
 });
 
@@ -24,8 +27,18 @@ const pgPool = new Pool({
 const mysqlConnection = mysql.createConnection({
   host: process.env.MYSQL_HOST,
   user: 'root',
-  password: 'War@123MS',
+  password: 'xyz',
   database: 'ormgpt',
+});
+
+// Initialize the PostgreSQL adapter
+const pgAdapter = new PostgresAdapter({
+  client: pgPool, // Use Pool for PostgreSQL
+});
+
+// Initialize the MySQL adapter
+const mysqlAdapter = new MysqlAdapter({
+  client: mysqlConnection, // Use Connection for MySQL
 });
 
 // Middleware
@@ -54,9 +67,17 @@ app.get('/', async (req, res) => {
   }
 });
 
+// Initialize ormGPT with a dbEngineAdapter (PostgreSQL or MySQL)
+const ormgpt = new ormGPT({
+  apiKey: process.env.HUGGING_FACE_API_KEY || "",
+  schemaFilePath: './example/schema.sql',
+  dialect: 'postgres', // Change to 'mysql' for MySQL
+  dbEngineAdapter: pgAdapter, // Change to mysqlAdapter if using MySQL
+});
+
 // Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
-export default app; // For testing
+export default app;
