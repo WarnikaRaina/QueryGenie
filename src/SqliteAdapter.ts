@@ -15,7 +15,7 @@ export class SqliteAdapter implements DatabaseEngineAdapter {
         resolve(statement.all());
       } else {
         const info = statement.run();
-        resolve([]);
+        resolve([]); // Return empty array for non-SELECT queries
       }
     });
   }
