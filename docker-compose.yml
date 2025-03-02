@@ -1,6 +1,7 @@
-
+version: '3.8'
 
 services:
+  # PostgreSQL service (db)
   db:
     image: postgres:15
     environment:
@@ -8,11 +9,12 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: War@123PG
     ports:
-      - "5432:5432"
+      - "5432:5432"  # Expose PostgreSQL on port 5432
     volumes:
-      - ./.docker/postgres:/var/lib/postgresql/data
+      - ./.docker/postgres:/var/lib/postgresql/data  # Persist data
     restart: unless-stopped
 
+  # MySQL service (db2) - If you still need it, leave it in, but use only for MySQL-related logic.
   db2:
     image: mysql:8
     environment:
@@ -20,25 +22,27 @@ services:
       MYSQL_DATABASE: ormgpt
     restart: unless-stopped
     ports:
-      - "3307:3306"
+      - "3307:3306"  # Expose MySQL on port 3307
     volumes:
-      - ./.docker/mysql:/var/lib/mysql
+      - ./.docker/mysql:/var/lib/mysql  # Persist MySQL data
 
+  # Application service (your Node.js app)
   app:
     build: .  # Build from the Dockerfile in the current directory
     environment:
       NODE_ENV: production
-      POSTGRES_HOST: db
-      MYSQL_HOST: db2
-      HUGGING_FACE_API_KEY: your-hugging-face-api-key
+      POSTGRES_HOST: db  # Set to PostgreSQL container
+      POSTGRES_PASSWORD: War@123PG  # Password for PostgreSQL
+      MYSQL_HOST: db2  # Only if MySQL logic is needed elsewhere
+      HUGGING_FACE_API_KEY: ${HUGGING_FACE_API_KEY}
     ports:
-      - "3000:3000"  # Exposing port 3000 (make sure your app binds to this port)
+      - "3000:3000"  # Exposing port 3000 for the app
     depends_on:
-      - db
-      - db2
+      - db  # Ensure the app waits for PostgreSQL
     volumes:
-      - .:/usr/src/app
+      - .:/usr/src/app  # Mount current directory to app container
     restart: unless-stopped
     command: ["npm", "start"]
     expose:
-      - "3000"
+      - "3000"  # Expose port 3000 for internal communication
+
