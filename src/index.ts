@@ -42,7 +42,7 @@ export class ormGPT {
     
     // Adjust the schemaFilePath to match the Docker container path
     // The path should be inside the Docker container. Assuming schema.sql is copied to /usr/src/app/example/schema.sql
-    const schemaPath = path.resolve("C:/Users/warni/Documents/ormAI/example/schema.sql");
+    const schemaPath = path.resolve("./example/schema.sql");
     
     try {
       this.dbSchema = fs.readFileSync(schemaPath, "utf-8");
