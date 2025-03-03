@@ -1,125 +1,71 @@
-const fetch = require('node-fetch');
-import fs from "fs";
-import path from "path";
-import { ErrorResponse } from "./ErrorResponse";
-import { SuccessResponse } from "./SuccessResponse";
-import { DatabaseEngineAdapter } from "./DatabaseEngineAdapter";
-import { ModelTuning } from "./ModelTuning";
+import 'dotenv/config';
+import { Pool } from 'pg';  // PostgreSQL connection pool
+import axios from 'axios';  // Hugging Face API integration
+import { ormGPT } from './ormGPT';  // Import ormGPT
+import { PostgresAdapter } from "../src/PostgresAdapter";  // Import PostgreSQL adapter
+import path from 'path';
 
-export class ormGPT {
-  private apiKey: string;
-  private apiUrl: string = "https://api-inference.huggingface.co/models/facebook/llama-2-7b";  // Hugging Face LLaMA model endpoint
-  private dbSchema: string;
-  private dialect: string;
-  private dbEngineAdapter?: DatabaseEngineAdapter;
-  private model: string = "facebook/llama-2-7b";  // Default to Hugging Face LLaMA model
-  private modelOptions: ModelTuning = {
-    temperature: 1,
-    max_tokens: 256,
-    top_p: 1,
-    frequency_penalty: 0,
-    presence_penalty: 0,
-  };
+// Check if the app is running in Docker
+const isDocker = process.env.DOCKER_ENV === 'true';  // Check if running inside Docker
 
-  constructor({
-    apiKey,
-    dialect,
-    schemaFilePath,
-    dbEngineAdapter,
-    apiUrl,
-    model,
-    modelOptions,
-  }: {
-    apiKey: string;
-    schemaFilePath: string;
-    dialect: "postgres" | "mysql" | "sqlite";
-    dbEngineAdapter?: DatabaseEngineAdapter;
-    apiUrl?: string;
-    model?: string;
-    modelOptions?: ModelTuning;
-  }) {
-    this.apiKey = apiKey;
-    
-    // Adjust the schemaFilePath to match the Docker container path
-    // The path should be inside the Docker container. Assuming schema.sql is copied to /usr/src/app/example/schema.sql
-    const schemaPath = path.resolve("./example/schema.sql");
-    
-    try {
-      this.dbSchema = fs.readFileSync(schemaPath, "utf-8");
-    } catch (error) {
-      console.error("Error reading schema file at path:", schemaPath);
-      throw error;
-    }
+// Use conditional path for schema.sql based on the environment
+const schemaFilePath = isDocker
+  ? '/usr/src/app/example/schema.sql'  // Path for Docker container
+  : path.resolve('./example/schema.sql');  // Path for local machine
 
-    this.dialect = dialect;
-    this.dbEngineAdapter = dbEngineAdapter;
+// Set PostgreSQL host depending on the environment (Docker or local)
+const pgHost = process.env.PG_HOST || 'localhost';  // Use PG_HOST environment variable or default to localhost
 
-    if (apiUrl) {
-      this.apiUrl = apiUrl;  // Hugging Face URL or custom API URL if needed
-    }
-    if (model) {
-      this.model = model;  // Default model is LLaMA
-    }
-    if (modelOptions) {
-      this.modelOptions = modelOptions;
-    }
-  }
+// PostgreSQL connection pool setup
+const pgPool = new Pool({
+  host: pgHost,  // Dynamically set based on environment (Docker or local)
+  port: 5432,
+  user: process.env.PG_USER || 'postgres',
+  password: process.env.PG_PASSWORD || 'War@123PG',
+  database: process.env.PG_DB || 'ormgpt',
+});
 
-  private async getResponse(request: string): Promise<string> {
-    const prompt = `
-                You are an SQL engine brain.
-                You are using ${this.dialect} dialect.
-                Having db schema as follows:
-                ${this.dbSchema}
-                
-                Write a query to fulfil the user request: ${request}
-                
-                Don't write anything else than SQL query.
-            `;
+// Initialize ORM GPT with PostgreSQL adapter
+const ormgpt = new ormGPT({
+  apiKey: process.env.HUGGING_FACE_API_KEY || '',  // Use Hugging Face API key from .env
+  schemaFilePath: schemaFilePath,  // Use the dynamically set schema file path
+  dialect: 'postgres',  // SQL dialect
+  dbEngineAdapter: new PostgresAdapter({ client: pgPool }),  // Pass pgPool to PostgresAdapter
+});
 
-    const response = await fetch(this.apiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,  // Use Hugging Face API key here
-      },
-      body: JSON.stringify({
-        model: this.model,  // Use the LLaMA model for generating SQL queries
-        inputs: prompt,  // Send prompt for query generation
-        ...this.modelOptions,  // Pass model options like temperature, etc.
-      }),
-    });
+(async () => {
+  try {
+    const userQuery = "Give me all users who ordered a laptop."; // Example user query
 
-    const data = (await response.json()) as ErrorResponse | SuccessResponse;
-
-    if (data.hasOwnProperty("error")) {
-      throw new Error((data as ErrorResponse).error.message);
-    }
-
-    return (data as SuccessResponse).generated_text;  // Response for the generated query from Hugging Face
-  }
-
-  public async getQuery(request: string): Promise<string> {
-    try {
-      return await this.getResponse(request);
-    } catch (error) {
-      console.error("Error when generating query", request);
-      throw error;
-    }
-  }
-
-  public async query(request: string): Promise<any[]> {
-    try {
-      if (!this.dbEngineAdapter) {
-        throw new Error("No dbEngineAdapter provided");
+    // Call Hugging Face API to generate SQL query from plain English
+    const huggingFaceResponse = await axios.post(
+      'https://api-inference.huggingface.co/models/facebook/llama-2-7b',  // Your Hugging Face model URL
+      { inputs: userQuery },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.HUGGING_FACE_API_KEY}`,
+        }
       }
+    );
 
-      const query = await this.getQuery(request);
-      console.log("Executing query", query);
-      return this.dbEngineAdapter.executeQuery(query);
-    } catch (error) {
-      console.error("Error when executing query", request);
-      throw error;
+    // The Hugging Face response will have a 'generated_text' property that contains the SQL query
+    const sqlQuery = huggingFaceResponse.data.generated_text;
+    if (typeof sqlQuery !== 'string') {
+      console.error('Invalid SQL query generated by Hugging Face');
+      return;
     }
+
+    console.log('Generated SQL:', sqlQuery);
+
+    // Execute the SQL query on PostgreSQL
+    const pgResult = await pgPool.query(sqlQuery);
+
+    // Log the result from PostgreSQL
+    console.log('PostgreSQL query result:', pgResult.rows);
+  } catch (error) {
+    console.error('Error executing query:', error);
+  } finally {
+    // Close the connection pool when done
+    await pgPool.end();
   }
-}
+})();
