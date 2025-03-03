@@ -32,11 +32,11 @@ async function loadSchema(schemaFilePath: string): Promise<string> {
 // Export the ormGPT class
 export class ormGPT {
   private apiKey: string;
-  public apiUrl: string = "https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b";  // Hugging Face LLaMA model endpoint
+  public apiUrl: string = "https://api-inference.huggingface.co/models/Salesforce/codegen-350M-mono";  // Hugging Face LLaMA model endpoint
   private dbSchema!: string;  // Marked as definitely assigned using '!'
   private dialect: string;
   private dbEngineAdapter?: DatabaseEngineAdapter;
-  private model: string = "meta-llama/Llama-2-7b";  // Default to Hugging Face LLaMA model
+  private model: string = "Salesforce/codegen-350M-mono";  // Default to Hugging Face LLaMA model
   private modelOptions: ModelTuning = {
     temperature: 1,
     max_tokens: 256,
@@ -86,7 +86,7 @@ export class ormGPT {
       this.apiUrl = apiUrl;  // Use the custom Hugging Face URL if provided
     }
     if (model) {
-      this.model = model;  // Default model is LLaMA
+      this.model = model;  // Default model is salesforce
     }
     if (modelOptions) {
       this.modelOptions = modelOptions;
