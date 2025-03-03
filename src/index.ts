@@ -13,6 +13,9 @@ const schemaFilePath = isDocker
   ? '/usr/src/app/example/schema.sql'  // Path for Docker container
   : path.resolve('./example/schema.sql');  // Path for local machine
 
+// Debugging: Log schema file path being used
+console.log('Schema file path being used:', schemaFilePath);
+
 // Set PostgreSQL host depending on the environment (Docker or local)
 const pgHost = process.env.PG_HOST || 'localhost';  // Use PG_HOST environment variable or default to localhost
 
@@ -39,7 +42,7 @@ const ormgpt = new ormGPT({
 
     // Call Hugging Face API to generate SQL query from plain English
     const huggingFaceResponse = await axios.post(
-      'https://api-inference.huggingface.co/models/facebook/llama-2-7b',  // Your Hugging Face model URL
+      'https://api-inference.huggingface.co/models/Salesforce/codegen-350M-mono',  // Your Hugging Face model URL
       { inputs: userQuery },
       {
         headers: {

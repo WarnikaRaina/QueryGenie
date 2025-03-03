@@ -30,19 +30,27 @@ services:
   app:
     build: .  # Build from the Dockerfile in the current directory
     environment:
-      NODE_ENV: production
-      POSTGRES_HOST: db  # Set to PostgreSQL container
-      POSTGRES_PASSWORD: War@123PG  # Password for PostgreSQL
-      MYSQL_HOST: db2  # Only if MySQL logic is needed elsewhere
-      HUGGING_FACE_API_KEY: ${HUGGING_FACE_API_KEY}
+      - NODE_ENV=production
+      - DOCKER_ENV=true  # Added DOCKER_ENV variable as requested
+      - POSTGRES_HOST=db  # Correctly set to PostgreSQL service container (db)
+      - POSTGRES_PASSWORD=War@123PG  # Password for PostgreSQL
+      - PG_HOST=localhost  # Set PG_HOST to db service name (important for the app to connect)
+      - PG_USER=postgres  # PostgreSQL user
+      - PG_PASSWORD=War@123PG  # PostgreSQL password
+      - PG_DB=ormgpt  # PostgreSQL database name
+      - MYSQL_HOST=db2  # Only if MySQL logic is needed elsewhere
+      - HUGGING_FACE_API_KEY=${HUGGING_FACE_API_KEY}
+    env_file:
+      - .env  # Load environment variables from the .env file  
     ports:
       - "3000:3000"  # Exposing port 3000 for the app
     depends_on:
-      - db  # Ensure the app waits for PostgreSQL
+      - db  # Ensure the app waits for PostgreSQL to be up before starting
     volumes:
       - .:/usr/src/app  # Mount current directory to app container
+      - ./example:/usr/src/app/example  # Mount the example folder explicitly
+      - ./example/schema.sql:/usr/src/app/example/schema.sql
     restart: unless-stopped
     command: ["npm", "start"]
     expose:
       - "3000"  # Expose port 3000 for internal communication
-
