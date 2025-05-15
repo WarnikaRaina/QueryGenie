@@ -1,6 +1,6 @@
-# Text2SQL: Seamless Natural Language to SQL Translation
+# QueryGenie: Seamless Natural Language to SQL Translation
 
-Text2SQL is an advanced tool that interprets natural language queries and converts them into executable SQL statements. Designed to bridge the gap between human language and database operations, Text2SQL simplifies data retrieval and manipulation processes.
+QueryGenie is an advanced tool that interprets natural language queries and converts them into executable SQL statements. Designed to bridge the gap between human language and database operations, QueryGenie simplifies data retrieval and manipulation processes.
 
 Key Features:
 
